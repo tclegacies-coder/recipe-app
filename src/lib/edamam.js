@@ -31,7 +31,13 @@ import { scorePantryMatch } from "./recipeUtils";
 
 const EDAMAM_APP_ID = import.meta.env.VITE_EDAMAM_APP_ID;
 const EDAMAM_APP_KEY = import.meta.env.VITE_EDAMAM_APP_KEY;
-const EDAMAM_ACCOUNT_USER = import.meta.env.VITE_EDAMAM_ACCOUNT_USER || EDAMAM_APP_ID;
+// This must be your actual Edamam account username (from your Edamam
+// dashboard profile) — NOT your app ID. An earlier version of this file
+// defaulted to the app ID when this was left blank, which is a plausible
+// cause of 401/403 rejections, since that's not a valid account
+// identifier. No fallback now — better to fail clearly than send a
+// value likely to be wrong.
+const EDAMAM_ACCOUNT_USER = import.meta.env.VITE_EDAMAM_ACCOUNT_USER;
 const BASE_URL = "https://api.edamam.com/api/recipes/v2";
 
 const CUISINE_MAP = {
@@ -88,6 +94,11 @@ async function runRecipeSearch(params) {
       "Edamam API credentials are missing. Add VITE_EDAMAM_APP_ID and VITE_EDAMAM_APP_KEY to your .env file."
     );
   }
+  if (!EDAMAM_ACCOUNT_USER) {
+    throw new Error(
+      "VITE_EDAMAM_ACCOUNT_USER is missing. Set it to your actual Edamam account username (from your Edamam dashboard) — not your app ID."
+    );
+  }
   const url = new URL(BASE_URL);
   url.searchParams.set("type", "public");
   url.searchParams.set("app_id", EDAMAM_APP_ID);
@@ -103,7 +114,9 @@ async function runRecipeSearch(params) {
   });
   if (!res.ok) {
     if (res.status === 401 || res.status === 403) {
-      throw new Error("Edamam rejected the request — check your app ID/key and account user.");
+      throw new Error(
+        "Edamam rejected the request. Check that: (1) your app ID/key are from the Recipe Search API application specifically, not a different Edamam product, (2) VITE_EDAMAM_ACCOUNT_USER is your actual Edamam account username, not your app ID, and (3) your Edamam plan is confirmed active."
+      );
     }
     if (res.status === 429) {
       throw new Error("Edamam's rate limit was hit. Wait a moment and try again.");

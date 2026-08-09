@@ -62,6 +62,17 @@ npm install
   **Application ID** and **Application Key** it gives you. Their free
   developer tier is rate-limited per minute rather than a hard daily cap,
   which is generally more forgiving than Spoonacular's.
+  - **When picking a plan, explicitly select the free "Developer" plan.**
+    Edamam's signup can default you toward a paid tier, and per their own
+    FAQ, if you land on a paid plan without a card on file you can't even
+    see your API key. If you don't see a "View" button next to your key,
+    that's what happened — go back to plan selection and pick the free
+    tier explicitly.
+  - **You also need `VITE_EDAMAM_ACCOUNT_USER`** — set it to your actual
+    Edamam account **username** (found on your Edamam dashboard profile),
+    not your app ID and not your app key. This is a required header on
+    every request; getting it wrong (or leaving it blank) is a common
+    cause of "Edamam rejected the request" errors.
 
 **Important limitation:** USDA FoodData Central has no barcode/UPC lookup
 endpoint — only name search. So for barcode scans, the real fallback chain
