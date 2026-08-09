@@ -21,6 +21,9 @@ export default function RecipeCard({ recipe, isSaved, onToggleSave }) {
         <h3 className="recipe-card-title">{recipe.title}</h3>
 
         <div className="recipe-card-meta">
+          <span className="recipe-tag recipe-tag-source">
+            {recipe.source === "edamam" ? "Edamam" : "Spoonacular"}
+          </span>
           {recipe.readyInMinutes != null && (
             <span className="recipe-tag">{recipe.readyInMinutes} min</span>
           )}

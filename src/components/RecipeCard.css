@@ -76,6 +76,12 @@
   color: var(--herb-dark);
 }
 
+.recipe-tag-source {
+  border-color: var(--citrus);
+  color: var(--ink);
+  font-weight: 600;
+}
+
 .recipe-pantry-match {
   margin-top: 2px;
 }

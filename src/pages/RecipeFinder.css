@@ -65,6 +65,51 @@
   font-weight: 600;
 }
 
+.finder-cut-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.finder-cut-select {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--steel);
+}
+
+.finder-cut-select select {
+  border: 1.5px solid var(--rule-thin);
+  border-radius: var(--radius-sm);
+  padding: 6px 9px;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--paper-raised);
+}
+
+.finder-toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.finder-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.finder-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--herb);
+}
+
 .finder-search-btn {
   align-self: flex-start;
   padding: 12px 28px;

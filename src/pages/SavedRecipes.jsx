@@ -25,9 +25,9 @@ export default function SavedRecipes() {
     fetchSaved();
   }, [fetchSaved]);
 
-  const handleRemove = async (recipeId) => {
-    await supabase.from("saved_recipes").delete().eq("user_id", userId).eq("recipe_id", recipeId);
-    setSaved((prev) => prev.filter((r) => r.recipe_id !== recipeId));
+  const handleRemove = async (id) => {
+    await supabase.from("saved_recipes").delete().eq("user_id", userId).eq("id", id);
+    setSaved((prev) => prev.filter((r) => r.id !== id));
   };
 
   return (
@@ -50,14 +50,15 @@ export default function SavedRecipes() {
               {r.image && <img src={r.image} alt="" className="saved-card-image" />}
               <div className="saved-card-body">
                 <h3>{r.title}</h3>
-                {r.ready_in_minutes != null && (
-                  <p className="saved-card-meta">{r.ready_in_minutes} min</p>
-                )}
+                <p className="saved-card-meta">
+                  {r.source === "edamam" ? "Edamam" : "Spoonacular"}
+                  {r.ready_in_minutes != null && ` · ${r.ready_in_minutes} min`}
+                </p>
                 <div className="saved-card-actions">
                   <a href={r.source_url} target="_blank" rel="noreferrer" className="btn-secondary">
                     View recipe
                   </a>
-                  <button className="nlabel-btn nlabel-btn-danger" onClick={() => handleRemove(r.recipe_id)}>
+                  <button className="nlabel-btn nlabel-btn-danger" onClick={() => handleRemove(r.id)}>
                     Remove
                   </button>
                 </div>

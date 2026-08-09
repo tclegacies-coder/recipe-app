@@ -1,8 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
+// Spoonacular IDs are numbers, Edamam IDs are full URI strings, and
+// recipe_id comes back from Supabase as text regardless — so every
+// saved-state lookup uses a "source:id" string key to stay consistent
+// and avoid any cross-source collision.
+function keyFor(recipe) {
+  return `${recipe.source}:${recipe.id}`;
+}
+
 export function useSavedRecipes(userId) {
-  const [savedIds, setSavedIds] = useState(new Set());
+  const [savedKeys, setSavedKeys] = useState(new Set());
   const [loading, setLoading] = useState(true);
 
   const fetchSaved = useCallback(async () => {
@@ -10,10 +18,10 @@ export function useSavedRecipes(userId) {
     setLoading(true);
     const { data, error } = await supabase
       .from("saved_recipes")
-      .select("recipe_id")
+      .select("recipe_id, source")
       .eq("user_id", userId);
     if (!error && data) {
-      setSavedIds(new Set(data.map((r) => r.recipe_id)));
+      setSavedKeys(new Set(data.map((r) => `${r.source}:${r.recipe_id}`)));
     }
     setLoading(false);
   }, [userId]);
@@ -26,7 +34,8 @@ export function useSavedRecipes(userId) {
     const { error } = await supabase.from("saved_recipes").insert([
       {
         user_id: userId,
-        recipe_id: recipe.id,
+        recipe_id: String(recipe.id),
+        source: recipe.source,
         title: recipe.title,
         image: recipe.image,
         ready_in_minutes: recipe.readyInMinutes,
@@ -34,29 +43,31 @@ export function useSavedRecipes(userId) {
       },
     ]);
     if (!error) {
-      setSavedIds((prev) => new Set(prev).add(recipe.id));
+      setSavedKeys((prev) => new Set(prev).add(keyFor(recipe)));
     }
     return { error };
   };
 
-  const unsaveRecipe = async (recipeId) => {
+  const unsaveRecipe = async (recipe) => {
     const { error } = await supabase
       .from("saved_recipes")
       .delete()
       .eq("user_id", userId)
-      .eq("recipe_id", recipeId);
+      .eq("recipe_id", String(recipe.id))
+      .eq("source", recipe.source);
     if (!error) {
-      setSavedIds((prev) => {
+      setSavedKeys((prev) => {
         const next = new Set(prev);
-        next.delete(recipeId);
+        next.delete(keyFor(recipe));
         return next;
       });
     }
     return { error };
   };
 
-  const toggleSave = (recipe) =>
-    savedIds.has(recipe.id) ? unsaveRecipe(recipe.id) : saveRecipe(recipe);
+  const isSaved = (recipe) => savedKeys.has(keyFor(recipe));
 
-  return { savedIds, loading, saveRecipe, unsaveRecipe, toggleSave, refresh: fetchSaved };
+  const toggleSave = (recipe) => (isSaved(recipe) ? unsaveRecipe(recipe) : saveRecipe(recipe));
+
+  return { isSaved, loading, saveRecipe, unsaveRecipe, toggleSave, refresh: fetchSaved };
 }

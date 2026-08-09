@@ -16,41 +16,23 @@
 //   cuisine, so selecting it as a "diet" adds it as a cuisine
 // - "Soul Food" isn't an official cuisine value — mapped to
 //   Southern + African + Cajun combined (cuisine OR-list)
+// - type=dessert and sort=random are both real, documented
+//   parameter values (confirmed on Spoonacular's meal-types and
+//   sorting-options reference)
+// - There is NO "kid friendly" filter anywhere in Spoonacular's
+//   taxonomy (not a diet, cuisine, or type value) — approximated by
+//   adding "kid friendly" as free text to the search query, per your
+//   choice. This depends on recipes actually being titled/tagged
+//   that way in Spoonacular's data, so it's not a guaranteed filter.
+// - "healthiness" is a real sort value — used for the "prioritize
+//   healthier recipes" option
 // ============================================================
+
+import { TIME_BUCKETS } from "./recipeOptions";
+import { scorePantryMatch } from "./recipeUtils";
 
 const SPOONACULAR_API_KEY = import.meta.env.VITE_SPOONACULAR_API_KEY;
 const BASE_URL = "https://api.spoonacular.com/recipes/complexSearch";
-
-export const PROTEINS = ["Chicken", "Beef", "Pork", "Fish", "Shrimp", "Tofu", "Eggs", "Beans"];
-
-export const CUISINES = [
-  "Mexican",
-  "Soul Food",
-  "Chinese",
-  "Korean",
-  "Italian",
-  "Indian",
-  "Thai",
-  "Mediterranean",
-];
-
-export const DIETS = [
-  "None",
-  "Keto",
-  "Paleo",
-  "Vegetarian",
-  "Vegan",
-  "Gluten-Free",
-  "Low-Carb",
-  "Mediterranean",
-];
-
-export const TIME_BUCKETS = [
-  { label: "Under 15 min", maxReadyTime: 15 },
-  { label: "15-30 min", maxReadyTime: 30 },
-  { label: "30-60 min", maxReadyTime: 60 },
-  { label: "60+ min", maxReadyTime: null },
-];
 
 // Cuisine labels the user picks -> Spoonacular's official cuisine value(s).
 const CUISINE_MAP = {
@@ -89,35 +71,18 @@ function buildCuisineParam(selectedCuisines, diet) {
 }
 
 function normalizeRecipe(raw) {
+  const ingredientNames = (raw.extendedIngredients || []).map((ing) => ing.name || ing.nameClean || "");
   return {
     id: raw.id,
+    source: "spoonacular",
     title: raw.title,
     image: raw.image,
     readyInMinutes: raw.readyInMinutes,
     servings: raw.servings,
     sourceUrl: raw.sourceUrl,
-    spoonacularScore: raw.spoonacularScore,
-    extendedIngredients: raw.extendedIngredients || [],
+    rankScore: raw.spoonacularScore || 0,
+    ingredientNames,
     matchedProteins: [],
-  };
-}
-
-function scorePantryMatch(recipe, pantryItems) {
-  const pantryNames = pantryItems.map((p) => (p.name || "").toLowerCase());
-  const ingredients = recipe.extendedIngredients || [];
-  let matched = 0;
-  ingredients.forEach((ing) => {
-    const ingName = (ing.name || ing.nameClean || "").toLowerCase();
-    if (!ingName) return;
-    const isMatch = pantryNames.some(
-      (pn) => pn && (ingName.includes(pn) || pn.includes(ingName))
-    );
-    if (isMatch) matched += 1;
-  });
-  return {
-    matchedCount: matched,
-    totalCount: ingredients.length,
-    missingCount: Math.max(0, ingredients.length - matched),
   };
 }
 
@@ -149,36 +114,64 @@ async function runComplexSearch(params) {
 }
 
 /**
- * Search for recipes matching the selected proteins (OR), cuisines (OR),
- * diet, and time budget, then rank by how much of the recipe's
+ * Search for recipes matching the selected proteins/cuts (OR), cuisines
+ * (OR), diet, and time budget, then rank by how much of the recipe's
  * ingredient list is already in the pantry.
  *
  * @param {Object} opts
- * @param {string[]} opts.proteins - 0-2 selected proteins
+ * @param {string[]} opts.proteins - 0-2 selected protein/cut strings
+ *   (e.g. "Chicken Breast"), already resolved by the caller
  * @param {string[]} opts.cuisines - 0-2 selected cuisines
  * @param {string} opts.diet - one of DIETS
  * @param {number} opts.timeBucketIndex - index into TIME_BUCKETS
  * @param {Array} opts.pantryItems - current pantry items (for ranking)
+ * @param {boolean} opts.isDessert - search desserts instead of savory
+ *   recipes (type=dessert); protein selection is ignored when true
+ * @param {boolean} opts.kidFriendly - append "kid friendly" to the
+ *   free-text search query (see note at top of file — approximation,
+ *   not a real filter)
+ * @param {boolean} opts.preferHealthy - sort by Spoonacular's
+ *   "healthiness" score instead of randomizing results
  */
-export async function searchRecipes({ proteins, cuisines, diet, timeBucketIndex, pantryItems }) {
+export async function searchSpoonacular({
+  proteins,
+  cuisines,
+  diet,
+  timeBucketIndex,
+  pantryItems,
+  isDessert = false,
+  kidFriendly = false,
+  preferHealthy = false,
+}) {
   const cuisineParam = buildCuisineParam(cuisines, diet);
   const dietParam = DIET_MAP[diet] || null;
   const maxCarbs = diet === "Low-Carb" ? LOW_CARB_MAX_CARBS_G : null;
   const maxReadyTime = TIME_BUCKETS[timeBucketIndex]?.maxReadyTime ?? null;
+  const effectiveProteins = isDessert ? [] : proteins;
+
+  // Prefer-healthy uses a deterministic health-ranked sort; otherwise
+  // every search is randomized via Spoonacular's own sort=random, which
+  // shuffles which recipes come back without needing an offset (an
+  // offset was tried here originally and caused empty results on narrow
+  // filter combos with small result pools — removed).
+  const sortParams = preferHealthy ? { sort: "healthiness" } : { sort: "random" };
 
   const sharedParams = {
     cuisine: cuisineParam,
     diet: dietParam,
     maxCarbs,
     maxReadyTime,
+    type: isDessert ? "dessert" : null,
+    query: kidFriendly ? "kid friendly" : null,
     addRecipeInformation: true,
     fillIngredients: true,
     instructionsRequired: true,
+    ...sortParams,
   };
 
   const byId = new Map();
 
-  if (proteins.length === 0) {
+  if (effectiveProteins.length === 0) {
     const results = await runComplexSearch({ ...sharedParams, number: 12 });
     results.forEach((r) => {
       const normalized = normalizeRecipe(r);
@@ -187,8 +180,8 @@ export async function searchRecipes({ proteins, cuisines, diet, timeBucketIndex,
   } else {
     // 2 proteins -> OR semantics via 2 separate calls (Spoonacular's
     // includeIngredients is AND, so this is required, not optional).
-    const numberPerCall = proteins.length === 2 ? 6 : 10;
-    for (const protein of proteins) {
+    const numberPerCall = effectiveProteins.length === 2 ? 6 : 10;
+    for (const protein of effectiveProteins) {
       const results = await runComplexSearch({
         ...sharedParams,
         includeIngredients: protein,
@@ -206,17 +199,8 @@ export async function searchRecipes({ proteins, cuisines, diet, timeBucketIndex,
     }
   }
 
-  const merged = Array.from(byId.values()).map((recipe) => ({
+  return Array.from(byId.values()).map((recipe) => ({
     ...recipe,
-    pantryMatch: scorePantryMatch(recipe, pantryItems || []),
+    pantryMatch: scorePantryMatch(recipe.ingredientNames, pantryItems),
   }));
-
-  merged.sort((a, b) => {
-    if (b.pantryMatch.matchedCount !== a.pantryMatch.matchedCount) {
-      return b.pantryMatch.matchedCount - a.pantryMatch.matchedCount;
-    }
-    return (b.spoonacularScore || 0) - (a.spoonacularScore || 0);
-  });
-
-  return merged;
 }

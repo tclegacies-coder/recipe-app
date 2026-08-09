@@ -47,13 +47,14 @@ create index if not exists pantry_items_user_id_idx on pantry_items (user_id);
 create table if not exists saved_recipes (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
-  recipe_id integer not null,
+  recipe_id text not null, -- Spoonacular IDs are numeric, Edamam IDs are full URIs — text fits both
+  source text not null default 'spoonacular', -- 'spoonacular' | 'edamam'
   title text not null,
   image text,
   ready_in_minutes integer,
   source_url text,
   created_at timestamptz not null default now(),
-  unique (user_id, recipe_id)
+  unique (user_id, recipe_id, source)
 );
 
 alter table saved_recipes enable row level security;
