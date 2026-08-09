@@ -1,0 +1,112 @@
+.recipe-card {
+  background: var(--paper-raised);
+  border: 1.5px solid var(--rule-thin);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+}
+
+.recipe-card-image-wrap {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--rule-thin);
+}
+
+.recipe-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.recipe-save-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(27, 38, 32, 0.55);
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recipe-save-btn-active {
+  background: var(--citrus);
+  color: var(--ink);
+}
+
+.recipe-card-body {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.recipe-card-title {
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.recipe-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.recipe-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--paper);
+  border: 1px solid var(--rule-thin);
+  border-radius: 999px;
+  padding: 3px 9px;
+  color: var(--steel);
+}
+
+.recipe-tag-protein {
+  border-color: var(--herb);
+  color: var(--herb-dark);
+}
+
+.recipe-pantry-match {
+  margin-top: 2px;
+}
+
+.recipe-pantry-match-bar {
+  height: 5px;
+  background: var(--rule-thin);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.recipe-pantry-match-fill {
+  height: 100%;
+  background: var(--herb);
+}
+
+.recipe-pantry-match-label {
+  font-size: 12px;
+  color: var(--steel);
+  margin: 5px 0 0;
+}
+
+.recipe-card-link {
+  margin-top: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--herb-dark);
+  text-decoration: none;
+  padding-top: 6px;
+}
+
+.recipe-card-link:hover {
+  text-decoration: underline;
+}

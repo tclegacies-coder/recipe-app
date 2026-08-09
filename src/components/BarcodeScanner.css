@@ -1,0 +1,78 @@
+.scanner-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 38, 32, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.scanner-panel {
+  background: var(--paper-raised);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-card);
+}
+
+.scanner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.scanner-header h3 {
+  font-size: 20px;
+}
+
+.scanner-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--ink);
+  line-height: 1;
+  padding: 4px 8px;
+}
+
+.scanner-video-wrap {
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 4 / 3;
+}
+
+.scanner-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scanner-reticle {
+  position: absolute;
+  top: 35%;
+  left: 10%;
+  right: 10%;
+  height: 30%;
+  border: 3px solid var(--citrus);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+.scanner-hint {
+  text-align: center;
+  color: var(--steel);
+  font-size: 14px;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.scanner-error {
+  color: var(--tomato);
+  font-size: 14px;
+  line-height: 1.5;
+}

@@ -1,0 +1,54 @@
+.app-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 2px solid var(--ink);
+  background: var(--paper-raised);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.app-nav-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--ink);
+}
+
+.app-nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.app-nav-links a {
+  text-decoration: none;
+  color: var(--steel);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px 2px;
+  border-bottom: 2px solid transparent;
+}
+
+.app-nav-links a:hover {
+  color: var(--ink);
+}
+
+.app-nav-link-active {
+  color: var(--ink) !important;
+  border-bottom-color: var(--herb) !important;
+}
+
+.app-nav-signout {
+  background: none;
+  border: 1px solid var(--rule-thin);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 13px;
+  color: var(--steel);
+}
+
+.app-nav-signout:hover {
+  border-color: var(--tomato);
+  color: var(--tomato);
+}

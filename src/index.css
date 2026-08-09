@@ -1,0 +1,92 @@
+/* ============================================================
+   Larder — design tokens
+   Concept: the app's own subject (nutrition facts labels) is
+   the source of the visual language. Thick rules, tabular
+   data rows, stamped headers — grocery-label vernacular,
+   not a generic dashboard.
+   ============================================================ */
+
+:root {
+  /* Color */
+  --ink: #1b2620;        /* near-black green-ink, primary text/dark surfaces */
+  --paper: #f6f1e4;      /* warm label-paper background */
+  --paper-raised: #fffdf7;
+  --herb: #3f6b4a;       /* primary accent — fresh herb green */
+  --herb-dark: #2c4d35;
+  --citrus: #e0a83e;     /* secondary accent — citrus gold */
+  --tomato: #c1432a;     /* alert / low-stock / CTA accent, used sparingly */
+  --steel: #6b7a78;      /* muted secondary text, "stamped" gray-green */
+  --rule: #1b2620;       /* label rule color (same as ink, used for borders) */
+  --rule-thin: rgba(27, 38, 32, 0.18);
+
+  /* Type */
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Layout */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --shadow-card: 0 1px 0 rgba(27, 38, 32, 0.08), 0 8px 24px -12px rgba(27, 38, 32, 0.25);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0;
+  color: var(--ink);
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+input,
+select {
+  font-family: var(--font-body);
+}
+
+a {
+  color: inherit;
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 3px solid var(--citrus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
