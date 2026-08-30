@@ -31,7 +31,7 @@ export default function Login() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <p className="login-eyebrow">Larder</p>
+        <p className="login-eyebrow">TC Recipes</p>
         <h1 className="login-title">
           {mode === "signin" ? "Sign in" : "Create your account"}
         </h1>
