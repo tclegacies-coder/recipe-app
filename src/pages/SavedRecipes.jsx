@@ -33,7 +33,7 @@ export default function SavedRecipes() {
   return (
     <div className="saved-page">
       <header className="saved-header">
-        <p className="saved-eyebrow">Larder</p>
+        <p className="saved-eyebrow">TC Recipes</p>
         <h1>Saved recipes</h1>
       </header>
 

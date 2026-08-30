@@ -9,7 +9,7 @@ import "./AppShell.css";
 function NavBar({ onSignOut }) {
   return (
     <nav className="app-nav">
-      <span className="app-nav-brand">Larder</span>
+      <span className="app-nav-brand">TC Recipes</span>
       <div className="app-nav-links">
         <NavLink to="/pantry" className={({ isActive }) => (isActive ? "app-nav-link-active" : "")}>
           Pantry

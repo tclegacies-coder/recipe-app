@@ -87,7 +87,7 @@ export default function RecipeFinder() {
   return (
     <div className="finder-page">
       <header className="finder-header">
-        <p className="finder-eyebrow">Larder</p>
+        <p className="finder-eyebrow">TC Recipes</p>
         <h1>Find something to cook</h1>
       </header>
 

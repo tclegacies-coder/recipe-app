@@ -44,7 +44,7 @@ export default function Pantry() {
     <div className="pantry-page">
       <header className="pantry-header">
         <div>
-          <p className="pantry-eyebrow">Larder</p>
+          <p className="pantry-eyebrow">TC Recipes</p>
           <h1>Your pantry</h1>
         </div>
       </header>
